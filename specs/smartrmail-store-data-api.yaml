@@ -1,0 +1,2931 @@
+openapi: 3.0.4
+info:
+  title: Store Data API
+  description: "API for accessing store-level data, analytics statistics, and managing lists and subscribers.\n\n## Authentication\n\nAll endpoints require a JWT token.\n\nThe token must be included in the Authorization header as a Bearer token.\n\n## Token Claims\n\nThe JWT token must contain the following claims:\n\n- `iss`: Token issuer\n- `aud`: Audience\n- `sub`: Canonical user ID\n- `email`: User email address\n- `jti`: Unique token identifier\n- `org_domain`: Organization domain (e.g., store.myshopify.com)\n- `org_name`: Organization name (optional)\n"
+  version: 1.0.0
+  contact:
+    name: Store Data API Support
+    email: smartrmail-engineering@relaycommerce.io
+  license:
+    name: Proprietary
+servers:
+  - url: https://go.smartrmail.com/api/v2
+    description: Production server
+  - url: https://staging.smartrmail.com/api/v2
+    description: Staging server
+  - url: http://localhost:5000/api/v2
+    description: Local development server
+security:
+  - BearerAuth: []
+tags:
+  - name: Store
+    description: Operations related to store data
+  - name: Statistics
+    description: Endpoints for retrieving various store statistics
+  - name: Lists
+    description: Manage subscriber lists
+  - name: Subscribers
+    description: Manage individual subscribers and their subscriptions to lists
+paths:
+  /store_data/store_data:
+    get:
+      summary: Get store data
+      description: Returns metadata and configuration details about the store.
+      operationId: getStoreData
+      tags:
+        - Store
+      responses:
+        "200":
+          description: Successfully retrieved store data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Unique identifier of the resource.
+                  zip:
+                    type: string
+                    description: Postal code of the location.
+                  city:
+                    type: string
+                    description: City of the location.
+                  name:
+                    type: string
+                    description: Name of the resource.
+                  email:
+                    type: string
+                    format: email
+                    description: Email address.
+                  phone:
+                    type: string
+                    description: Phone number.
+                  domain:
+                    type: string
+                    description: Domain associated with the resource.
+                  source:
+                    type: string
+                    nullable: true
+                    description: "Data source (e.g., all, newsletters, automations,
+                      recommendations)."
+                  country:
+                    type: string
+                    description: Country of the location (ISO 3166-1 alpha-2 two-letter
+                      code).
+                  address1:
+                    type: string
+                    description: First line of the address.
+                  address2:
+                    type: string
+                    description: Second line of the address (optional).
+                  currency:
+                    type: string
+                    description: Currency used (ISO 4217 three-letter code).
+                  finances:
+                    type: boolean
+                    description: Indicates if the resource has associated financial
+                      information.
+                  latitude:
+                    type: number
+                    description: Geographical latitude.
+                  province:
+                    type: string
+                    description: Province or state of the location.
+                  timezone:
+                    type: string
+                    description: Timezone of the location.
+                  longitude:
+                    type: number
+                    description: Geographical longitude.
+                  plan_name:
+                    type: string
+                    description: Name of the subscription plan.
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Date and time of resource creation.
+                  shop_owner:
+                    type: string
+                    description: Owner of the shop.
+                  updated_at:
+                    type: string
+                    format: date-time
+                    description: Date and time of the last resource update.
+                  weight_unit:
+                    type: string
+                    description: Unit of weight used (e.g., kg, lb).
+                  country_code:
+                    type: string
+                    description: Country code (ISO 3166-1 alpha-2).
+                  country_name:
+                    type: string
+                    description: Full name of the country.
+                  county_taxes:
+                    type: boolean
+                    description: Indicates if county taxes are applied.
+                  money_format:
+                    type: string
+                    description: Format for displaying monetary values.
+                  tax_shipping:
+                    type: string
+                    nullable: true
+                    description: Information about shipping taxes.
+                  has_discounts:
+                    type: boolean
+                    description: Indicates if the resource has discounts applied.
+                  iana_timezone:
+                    type: string
+                    description: Timezone in IANA format.
+                  province_code:
+                    type: string
+                    description: Code of the province or state.
+                  customer_email:
+                    type: string
+                    format: email
+                    description: Customer's email address.
+                  has_gift_cards:
+                    type: boolean
+                    description: Indicates if the resource accepts gift cards.
+                  has_storefront:
+                    type: boolean
+                    description: Indicates if the resource has an online storefront.
+                  primary_locale:
+                    type: string
+                    description: "Primary locale (e.g., en, pt)."
+                  setup_required:
+                    type: boolean
+                    description: Indicates if initial setup is required.
+                  taxes_included:
+                    type: boolean
+                    description: Indicates if taxes are included in prices.
+                  myshopify_domain:
+                    type: string
+                    description: Associated myshopify.com domain.
+                  plan_display_name:
+                    type: string
+                    description: Display name of the plan.
+                  google_apps_domain:
+                    type: string
+                    nullable: true
+                    description: Associated Google Apps domain.
+                  pre_launch_enabled:
+                    type: boolean
+                    description: Indicates if pre-launch mode is enabled.
+                  primary_location_id:
+                    type: integer
+                    description: ID of the primary location.
+                  eligible_for_payments:
+                    type: boolean
+                    description: Indicates if the resource is eligible for payments.
+                  checkout_api_supported:
+                    type: boolean
+                    description: Indicates if the checkout API is supported.
+                  money_in_emails_format:
+                    type: string
+                    description: Format for displaying monetary values in emails.
+                  multi_location_enabled:
+                    type: boolean
+                    description: Indicates if multiple locations are enabled.
+                  money_with_currency_format:
+                    type: string
+                    description: Format for displaying monetary values with currency.
+                  transactional_sms_disabled:
+                    type: boolean
+                    description: Indicates if transactional SMS are disabled.
+                  auto_configure_tax_inclusivity:
+                    type: boolean
+                    description: Indicates if automatic tax inclusivity configuration
+                      is enabled.
+                  enabled_presentment_currencies:
+                    type: array
+                    items:
+                      type: string
+                    description: List of enabled presentment currencies.
+                  requires_extra_payments_agreement:
+                    type: boolean
+                    description: Indicates if an extra payments agreement is required.
+                  money_with_currency_in_emails_format:
+                    type: string
+                    description: Format for displaying monetary values with currency
+                      in emails.
+                  marketing_sms_consent_enabled_at_checkout:
+                    type: boolean
+                    description: Indicates if marketing SMS consent is enabled at
+                      checkout.
+                  platform:
+                    type: string
+                    description: Platform associated with the resource.
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/main_stats:
+    get:
+      summary: Get main statistics
+      description: Returns overall statistics for sales, orders, and subscribers.
+      operationId: getMainStats
+      tags:
+        - Statistics
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+        - name: source
+          in: query
+          required: false
+          description: Source of data (filters the stats)
+          schema:
+            type: string
+            enum: [all, newsletters, automations, recommendations]
+            default: all
+      responses:
+        "200":
+          description: Successfully retrieved main stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders_count: { type: integer, description: Total number of orders. }
+                  sales_total: { type: string, description: Raw sales total value as string. }
+                  formatted_total:
+                    { type: string, description: Formatted sales total with currency. }
+                  new_subscribers_count: { type: integer, description: Number of new subscribers. }
+                  total_delivered_count: { type: integer, description: Total number of deliveries. }
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/sales_stats:
+    get:
+      summary: Get sales statistics
+      description: Returns statistics related to sales and orders only.
+      operationId: getSalesStats
+      tags:
+        - Statistics
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+        - name: source
+          in: query
+          required: false
+          description: Source of data (filters the stats)
+          schema:
+            type: string
+            enum: [all, newsletters, automations, recommendations]
+            default: all
+      responses:
+        "200":
+          description: Successfully retrieved sales stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders_count: { type: integer, description: Total number of orders. }
+                  sales_total: { type: string, description: Total sales value. }
+                  formatted_total:
+                    { type: string, description: Total sales value formatted with currency. }
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/engagement_stats:
+    get:
+      summary: Get engagement statistics
+      description: Returns statistics about email/message engagement and conversions.
+      operationId: getEngagementStats
+      tags:
+        - Statistics
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: true
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+        - name: source
+          in: query
+          required: false
+          description: Source of data (filters the stats)
+          schema:
+            type: string
+            enum: [all, newsletters, automations, recommendations]
+            default: all
+      responses:
+        "200":
+          description: Successfully retrieved engagement stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uniq_clicked_count: { type: integer, description: Number of unique clicks. }
+                  uniq_opened_count: { type: integer, description: Number of unique opens. }
+                  uniq_delivered_count: { type: integer, description: Number of unique deliveries. }
+                  total_delivered_count: { type: integer, description: Total number of deliveries. }
+                  open_rate:
+                    { type: number, format: float, description: Open rate (in percentage). }
+                  click_rate:
+                    { type: number, format: float, description: Click rate (in percentage). }
+                  conversion_rate:
+                    { type: number, format: float, description: Conversion rate (in percentage). }
+                  uniq_orders_count: { type: integer, description: Number of unique orders. }
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/audience_stats:
+    get:
+      summary: Get audience statistics
+      description: Returns statistics about the store's audience.
+      operationId: getAudienceStats
+      tags:
+        - Statistics
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+        - name: source
+          in: query
+          required: false
+          description: Source of data (filters the stats)
+          schema:
+            type: string
+            enum: [all, newsletters, automations, recommendations]
+            default: all
+      responses:
+        "200":
+          description: Successfully retrieved audience stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  max_subscribers_count:
+                    { type: integer, description: Maximum number of subscribers. }
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/campaigns_stats:
+    get:
+      summary: Get campaign statistics
+      description: Returns combined sales and engagement statistics for campaigns.
+      operationId: getCampaignsStats
+      tags:
+        - Statistics
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+        - name: source
+          in: query
+          required: false
+          description: Source of data (filters the stats)
+          schema:
+            type: string
+            enum: [all, newsletters, automations, recommendations]
+            default: all
+      responses:
+        "200":
+          description: Successfully retrieved campaigns stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders_count: { type: integer, description: Total number of orders. }
+                  sales_total: { type: string, description: Total sales value. }
+                  formatted_total:
+                    { type: string, description: Total sales value formatted with currency. }
+                  uniq_clicked_count: { type: integer, description: Number of unique clicks. }
+                  uniq_opened_count: { type: integer, description: Number of unique opens. }
+                  uniq_delivered_count:
+                    { type: integer, description: Number of unique deliveries. }
+                  total_delivered_count:
+                    { type: integer, description: Total number of deliveries. }
+                  open_rate:
+                    { type: number, format: float, description: Open rate (in percentage). }
+                  click_rate:
+                    { type: number, format: float, description: Click rate (in percentage). }
+                  conversion_rate:
+                    {
+                      type: number,
+                      format: float,
+                      description: Conversion rate (in percentage).
+                    }
+                  uniq_orders_count: { type: integer, description: Number of unique orders. }
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /stats/campaign_stats/{campaign_id}:
+    get:
+      summary: Get specific campaign statistics
+      description: Returns sales and engagement statistics for a specific campaign.
+      operationId: getCampaignStats
+      tags:
+        - Statistics
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          description: Unique identifier of the campaign.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved campaign stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStatsResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/newsletters_data:
+    get:
+      summary: Get specific campaign statistics
+      description: Returns sales and engagement statistics for a specific campaign.
+      operationId: newslettersData
+      tags:
+        - Campaigns
+      parameters:
+        - name: campaign_status
+          in: query
+          required: false
+          description: Status of the campaign (e.g., sent, draft).
+          schema:
+            type: string
+            default: sent
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination (default is 1).
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          required: false
+          description: Number of items per page for pagination (default is 25).
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the data range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the data range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Successfully retrieved campaign stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignStatsResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/create_newsletter_from_template:
+    post:
+      summary: Create newsletter from template
+      description: Creates a new newsletter campaign based on an existing template.
+      operationId: createNewsletterFromTemplate
+      tags:
+        - Campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - template_id
+              properties:
+                template_id:
+                  type: integer
+                  description: The ID of the template campaign to base the new newsletter on.
+                with_header_links:
+                  type: boolean
+                  default: false
+                  description: Whether to include header links in the new newsletter.
+      responses:
+        "200":
+          description: The template selected is an AI Template. The creation process cannot be completed via API alone. The Agent must provide a link to the 'redirect_url' to the user so they can complete the setup in the browser.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ai_template:
+                    type: boolean
+                    description: Indicates this is an AI-powered template newsletter and the user needs to complete setup in the browser.
+                    example: true
+                  redirect_url:
+                    type: string
+                    description: The URL the user must visit to continue.
+                    format: uri
+                    example: "https://app.smartrmail.com/newsletters/new?template_id=123"
+        "201":
+          description: The newsletter was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStatsResponse'
+        "404":
+          description: The specified template was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Unprocessable entity, usually due to validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /campaigns/templates:
+    get:
+      summary: Get campaign templates
+      description: Retrieves a list of available campaign (newsletter and recommendations) templates for the store.
+      operationId: getCampaignTemplates
+      tags:
+        - Campaigns
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of lists to return per page.
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: Search term to filter templates by name.
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Category to filter templates.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved campaign templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignTemplate'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/create_newsletter:
+    post:
+      summary: Create a newsletter campaign
+      description: Creates a new newsletter campaign with the provided payload.
+      operationId: createNewsletter
+      tags:
+        - Campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterPayload'
+      responses:
+        "201":
+          description: Successfully created newsletter campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStatsResponse'
+        "400":
+          description: Invalid format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{id}/update_newsletter:
+    patch:
+      summary: Update a newsletter campaign
+      description: Updates an existing newsletter campaign with the provided payload.
+      operationId: updateNewsletter
+      tags:
+        - Campaigns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the campaign to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterUpdatePayload'
+      responses:
+        "200":
+          description: Successfully updated newsletter campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStatsResponse'
+        "400":
+          description: Invalid format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{id}/deliver:
+    post:
+      summary: Deliver a newsletter campaign
+      description: Immediately sends a newsletter campaign to its recipients.
+      operationId: deliverNewsletter
+      tags:
+        - Campaigns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the campaign to deliver.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Successfully delivered newsletter campaign
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the delivery was successful.
+        "400":
+          description: Invalid delivery request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{id}/schedule:
+    post:
+      summary: Schedule a newsletter campaign
+      description: Schedules a newsletter campaign to be sent at a specified date and time.
+      operationId: scheduleNewsletter
+      tags:
+        - Campaigns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the campaign to schedule.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - scheduled_at
+              properties:
+                scheduled_at:
+                  type: string
+                  format: date-time
+                  description: The date and time when the campaign should be sent (ISO 8601 format).
+      responses:
+        "201":
+          description: Successfully scheduled newsletter campaign
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the scheduling was successful.
+        "400":
+          description: Invalid scheduling details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{id}/cancel_schedule:
+    post:
+      summary: Cancel scheduled newsletter campaign
+      description: Cancels a previously scheduled newsletter campaign.
+      operationId: cancelScheduledNewsletter
+      tags:
+        - Campaigns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the campaign to cancel scheduling for.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Successfully canceled scheduled newsletter campaign
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the cancellation was successful.
+        "400":
+          description: Invalid cancellation request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{id}/test:
+    post:
+      summary: Send test newsletter campaign
+      description: Sends a test version of the newsletter campaign to specified email addresses.
+      operationId: sendTestNewsletter
+      tags:
+        - Campaigns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the campaign to send a test for.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+              properties:
+                to:
+                  type: string
+                  description: Comma-separated list of email addresses to send the test to.
+      responses:
+        "201":
+          description: Successfully sent test newsletter campaign
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the test email was sent successfully.
+        "400":
+          description: Invalid test email request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /pop_ups/templates:
+    get:
+      summary: Get pop-up templates
+      description: Retrieves a list of available pop-up templates for the store.
+      operationId: getPopUpTemplates
+      tags:
+        - Pop-ups
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of lists to return per page.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Successfully retrieved pop-up templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Unique identifier for the pop-up template.
+                    name:
+                      type: string
+                      description: Name of the pop-up template.
+                    size:
+                      type: string
+                      description: Size of the pop-up template (e.g., 'small', 'medium', 'large').
+                    side_image_position:
+                      type: string
+                      description: Position of the side image in the pop-up template (e.g., 'left', 'right').
+                    show_on_desktop:
+                      type: boolean
+                      description: Indicates if the pop-up is shown on desktop devices.
+                    show_on_mobile:
+                      type: boolean
+                      description: Indicates if the pop-up is shown on mobile devices.
+                    platform:
+                      type: string
+                      description: Platform for which the pop-up template is designed (e.g., 'shopify').
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /lists:
+    get:
+      summary: List subscriber lists
+      description: Retrieves a paginated list of active, non-smart subscriber lists.
+      operationId: getLists
+      tags:
+        - Lists
+      parameters:
+        - name: limit
+          in: query
+          description: The number of lists to return per page. Use '0' to return all lists.
+          schema:
+            type: integer
+            default: 25
+        - name: offset
+          in: query
+          description: The number of lists to skip before starting to collect the result set.
+          schema:
+            type: integer
+            default: 0
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of lists to return per page.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: A list of subscriber lists.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriberList'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a subscriber list
+      description: Creates a new subscriber list.
+      operationId: createList
+      tags:
+        - Lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: The name of the new list.
+      responses:
+        "201":
+          description: The list was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriberList'
+        "422":
+          description: Unprocessable entity, usually due to validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /lists/{list_id}:
+    get:
+      summary: Get a specific list
+      description: Retrieves the details of a single subscriber list by its slug.
+      operationId: getList
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Details for the requested list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriberList'
+        "404":
+          description: The requested list was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update a list
+      description: Updates the name of a specific subscriber list.
+      operationId: updateList
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The new name for the list.
+      responses:
+        "200":
+          description: The list was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriberList'
+        "404":
+          description: The requested list was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Unprocessable entity, usually due to validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Deactivate a list
+      description: Deactivates a subscriber list, effectively soft-deleting it.
+      operationId: deleteList
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list to deactivate.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The list was deactivated successfully.
+        "404":
+          description: The requested list was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /lists/{list_id}/list_subscribers:
+    get:
+      summary: List subscribers in a list
+      description: Retrieves all subscribers belonging to a specific list.
+      operationId: getListSubscribers
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of subscribers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: The requested list was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Add subscribers to a list
+      description: Adds one or more subscribers to a specific list in a single bulk operation.
+      operationId: addSubscribersToList
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subscribers
+              properties:
+                subscribers:
+                  type: array
+                  description: An array of subscriber objects to add to the list.
+                  items:
+                    $ref: '#/components/schemas/SubscriberInput'
+      responses:
+        "200":
+          description: The subscribers that were successfully imported.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscriber'
+        "422":
+          description: Unprocessable entity. This can happen if the input is empty or invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        "404":
+          description: The requested list was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /lists/{list_id}/list_subscribers/{id}:
+    delete:
+      summary: Remove a subscriber from a list
+      description: Removes a subscriber from a specific list without deleting the subscriber from the system.
+      operationId: removeSubscriberFromList
+      tags:
+        - Lists
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          description: The URL-friendly slug of the list.
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the subscriber (e.g., email address or ID).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The subscriber was successfully removed from the list.
+        "404":
+          description: The requested list or subscriber was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /subscribers/{id}:
+    get:
+      summary: Get a subscriber
+      description: Retrieves the details of a single subscriber by their unique identifier.
+      operationId: getSubscriber
+      tags:
+        - Subscribers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the subscriber (e.g., email address or ID).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The details for the requested subscriber.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: The requested subscriber was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update a subscriber
+      description: Updates the details of a specific subscriber.
+      operationId: updateSubscriber
+      tags:
+        - Subscribers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the subscriber to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriber:
+                  $ref: '#/components/schemas/SubscriberInput'
+      responses:
+        "200":
+          description: The subscriber was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: The requested subscriber was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Unprocessable entity, usually due to validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /subscribers/{id}/unsubscribe:
+    post:
+      summary: Unsubscribe a subscriber
+      description: Unsubscribes a user from all mailings.
+      operationId: unsubscribeSubscriber
+      tags:
+        - Subscribers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the subscriber to unsubscribe.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The subscriber was successfully unsubscribed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: The requested subscriber was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /subscribers/{id}/resubscribe:
+    post:
+      summary: Resubscribe a subscriber
+      description: Resubscribes a previously unsubscribed user.
+      operationId: resubscribeSubscriber
+      tags:
+        - Subscribers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the subscriber to resubscribe.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The subscriber was successfully resubscribed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: The requested subscriber was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workflows:
+    get:
+      summary: Get automations data
+      description: Returns a list of automations with their statuses and basic info.
+      operationId: getAutomationsData
+      tags:
+        - Automations
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filter automations by their status (e.g., active, paused).
+          schema:
+            type: string
+            enum: [active, paused]
+        - name: workflow_type
+          in: query
+          required: false
+          description: Filter automations by their type (e.g., EmailWorkflow, SubscriberListWorkflow).
+          schema:
+            type: string
+        - name: workflow_status
+          in: query
+          required: false
+          description: Filter automations by their internal workflow status (e.g., populating, pending).
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination (default is 1).
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          required: false
+          description: Number of items per page for pagination (default is 25).
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          required: false
+          description: Filter automations by creation start date (e.g., '2025-01-01'), required if end_date is provided
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: Filter automations by creation end date (e.g., '2025-01-31'), required if start_date is provided
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Successfully retrieved automations data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Automation'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workflows/{id}/activate:
+    post:
+      summary: Activate automation
+      description: Activates a specific automation.
+      operationId: activateAutomation
+      tags:
+        - Automations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the automation to activate.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully activated the automation status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Unique identifier of the automation.
+                  status:
+                    type: string
+                    description: New status of the automation after toggling.
+        "404":
+          description: The requested automation was not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the automation was not found.
+  /workflows/{id}/disable:
+    post:
+      summary: Disable automation
+      description: Disables a specific automation.
+      operationId: disableAutomation
+      tags:
+        - Automations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the automation to disable.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully disabled the automation status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Unique identifier of the automation.
+                  status:
+                    type: string
+                    description: New status of the automation after toggling.
+        "404":
+          description: The requested automation was not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the automation was not found.
+  /workflows/create_from_template:
+    post:
+      summary: Create an automation from a template
+      description: Creates a new automation based on a specified template.
+      operationId: createAutomationFromTemplate
+      tags:
+        - Automations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - template_id
+              properties:
+                template_id:
+                  type: integer
+                  description: The ID of the template to use for creating the automation.
+      responses:
+        "201":
+          description: Successfully created the automation from the template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Automation'
+        "404":
+          description: The specified template was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "400":
+          description: Bad request, possibly due to missing or invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workflows/templates:
+    get:
+      summary: Get workflow templates
+      description: Retrieves a list of available workflow templates for the store.
+      operationId: getWorkflowTemplates
+      tags:
+        - Automations
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of lists to return per page.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Successfully retrieved workflow templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Automation'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coupons:
+    get:
+      summary: List available coupons
+      description: Retrieves a list of available coupons.
+      operationId: getCoupons
+      tags:
+        - Coupons
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of coupons to return per page.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: A list of available coupons.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coupon'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new coupon
+      description: Creates a new coupon with the specified details.
+      operationId: createCoupon
+      tags:
+        - Coupons
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CouponInput'
+      responses:
+        "201":
+          description: The coupon was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coupon'
+        "422":
+          description: Unprocessable entity, usually due to validation errors.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: A short description of the error.
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /designs:
+    get:
+      summary: List available email designs
+      description: Retrieves a list of available email designs.
+      operationId: getDesigns
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of designs to return per page.
+          schema:
+            type: integer
+            default: 10
+      tags:
+        - Designs
+      responses:
+        "200":
+          description: A list of available email designs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Design'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /designs/{id}:
+    get:
+      summary: Get a specific email design
+      description: Retrieves the details of a single email design by its unique identifier.
+      operationId: getDesign
+      tags:
+        - Designs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the email design.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The details for the requested email design.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Design'
+        "404":
+          description: The requested email design was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mailings:
+    get:
+      summary: List mailings
+      description: Retrieves list of mailings.
+      operationId: getMailings
+      tags:
+        - Mailings
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of mailings to return per page.
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the date range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the date range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: A list of mailings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mailing'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mailings_content:
+    get:
+      summary: List mailings HTML
+      description: Retrieves list of mailings with their HTML content.
+      operationId: getMailingsContent
+      tags:
+        - Mailings
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of mailings to return per page.
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          required: false
+          description: Start date for the date range (e.g., '2025-01-01')
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          description: End date for the date range (e.g., '2025-01-31')
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: A list of mailings with their id and HTML content.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MailingContent'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mailings_content/{id}:
+    get:
+      summary: Get mailing HTML
+      description: Retrieves the HTML content of a specific mailing by its unique identifier.
+      operationId: getMailingContent
+      tags:
+        - Mailings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the mailing.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The HTML content for the requested mailing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingContent'
+        "404":
+          description: The requested mailing was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /product_feeds:
+    get:
+      summary: List product feeds
+      description: Retrieves a list of product feeds.
+      operationId: getProductFeeds
+      tags:
+        - Product Feeds
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve.
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: The number of product feeds to return per page.
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: Filter product feeds by their status (e.g., 'active', 'draft', 'refreshing').
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of product feeds.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductFeed'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a product feed
+      description: Creates a new product feed.
+      operationId: createProductFeed
+      tags:
+        - Product Feeds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+              properties:
+                name:
+                  type: string
+                  description: The name of the product feed.
+                type:
+                  type: string
+                  description: The type of the product feed (e.g., 'BestSellerProductFeed', 'NewArrivalProductFeed', 'SlowMovingProductFeed').
+                min_stock:
+                  type: integer
+                  description: Minimum stock level for products to be included in the feed.
+                ignore_stock:
+                  type: boolean
+                  description: Whether to ignore stock levels when generating the feed.
+      responses:
+        "201":
+          description: The product feed was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductFeed'
+        "422":
+          description: Errors occurred while creating the product feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        "401":
+          description: Authentication failed or token invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A short description of the error.
+        message:
+          type: string
+          description: A detailed error message.
+        code:
+          type: string
+          description: An internal error code.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of when the error occurred.
+      example:
+        error: Invalid JWT token
+        message: Authorization header with Bearer token required
+        code: UNAUTHORIZED
+        timestamp: "2025-01-01T12:00:00Z"
+    ValidationErrorResponse:
+      type: object
+      description: Describes validation errors on a resource's fields.
+      properties:
+        field_name:
+          type: array
+          items:
+            type: string
+      example:
+        name:
+          - "can't be blank"
+    CampaignStatsResponse:
+      type: object
+      properties:
+        sent_count:
+          type: integer
+          description: Number of messages sent in the campaign.
+        uniq_opened_count:
+          type: integer
+          description: Number of unique opens in the campaign.
+        uniq_opened_percentage:
+          type: number
+          format: float
+          description: Percentage of unique opens in the campaign.
+        uniq_clicked_count:
+          type: integer
+          description: Number of unique clicks in the campaign.
+        uniq_clicked_percentage:
+          type: number
+          format: float
+          description: Percentage of unique clicks in the campaign.
+        sales:
+          type: number
+          format: float
+          description: Total sales generated from the campaign.
+        sales_total:
+          type: number
+          format: float
+          description: Total sales amount from the campaign.
+        formatted_sales:
+          type: string
+          description: Formatted sales amount with currency.
+        orders_count:
+          type: integer
+          description: Number of orders generated from the campaign.
+        clicked_count:
+          type: integer
+          description: Total number of clicks in the campaign.
+        opened_count:
+          type: integer
+          description: Total number of opens in the campaign.
+        unsubscribed_count:
+          type: integer
+          description: Number of unsubscribes from the campaign.
+        unsubscribed_percentage:
+          type: number
+          format: float
+          description: Percentage of unsubscribes from the campaign.
+        avg_engagement:
+          type: number
+          format: float
+          description: Average engagement rate for the campaign.
+        bounced_count:
+          type: integer
+          description: Number of bounced messages in the campaign.
+        complained_count:
+          type: integer
+          description: Number of complaints received for the campaign.
+        subscriber_lists:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Unique identifier of the subscriber list.
+              name:
+                type: string
+                description: Name of the subscriber list.
+        excluded_subscriber_lists:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Unique identifier of the excluded subscriber list.
+              name:
+                type: string
+                description: Name of the excluded subscriber list.
+    CampaignTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the campaign template.
+        name:
+          type: string
+          description: Name of the campaign template.
+        type:
+          type: string
+          description: Type of the template (e.g., 'campaign', 'pop_up').
+        status:
+          type: string
+          description: Status of the template (e.g., 'active', 'inactive').
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the template was created.
+        use_count:
+          type: integer
+          description: Number of times the template has been used.
+        last_use:
+          type: string
+          format: date-time
+          description: The date and time the template was last used.
+        category:
+          type: string
+          description: Category of the template.
+        subcategory:
+          type: string
+          description: Subcategory of the template.
+        date:
+          type: string
+          format: date-time
+          description: Date associated with the template.
+        payd_plan:
+          type: boolean
+          description: Indicates if the template is part of a paid plan.
+    Design:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the design.
+        title:
+          type: string
+          description: The title of the design.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the design was created.
+        button_text:
+          type: string
+          description: Text for buttons in the design.
+        heading_font:
+          type: string
+          description: Font used for headings in the design.
+        text_font:
+          type: string
+          description: Font used for body text in the design.
+        store_id:
+          type: integer
+          description: Identifier for the store associated with the design.
+        footer_text:
+          type: string
+          description: Text for the footer in the design.
+        include_logo:
+          type: boolean
+          description: Indicates if the logo is included in the design.
+        button_font_color:
+          type: string
+          description: Color of the button font in the design.
+        button_color:
+          type: string
+          description: Color of the buttons in the design.
+        button_stroke_width:
+          type: integer
+          description: Stroke width of the buttons in the design.
+        button_stroke_color:
+          type: string
+          description: Stroke color of the buttons in the design.
+        heading_font_color:
+          type: string
+          description: Color of the heading font in the design.
+        text_font_color:
+          type: string
+          description: Color of the body text font in the design.
+        header_link_font:
+          type: string
+          description: Font used for header links in the design.
+        header_link_color:
+          type: string
+          description: Color of the header links in the design.
+        header_link_size:
+          type: integer
+          description: Font size of the header links in the design.
+        divider_line_color:
+          type: string
+          description: Color of the divider lines in the design.
+        show_divider_lines:
+          type: boolean
+          description: Indicates if divider lines are shown in the design.
+        logo_header_color:
+          type: string
+          description: Color of the logo header in the design.
+        header_links_color:
+          type: string
+          description: Color of the header links in the design.
+        body_color:
+          type: string
+          description: Background color of the email body in the design.
+        footer_color:
+          type: string
+          description: Background color of the email footer in the design.
+        logo_height:
+          type: integer
+          description: Height of the logo in the design.
+        logo_width:
+          type: integer
+          description: Width of the logo in the design.
+        logo_locked:
+          type: boolean
+          description: Indicates if the logo dimensions are locked in the design.
+        logo_orig_width:
+          type: integer
+          description: Original width of the logo in the design.
+        logo_orig_height:
+          type: integer
+          description: Original height of the logo in the design.
+        header_custom_html:
+          type: string
+          description: Custom HTML for the header in the design.
+        footer_custom_html:
+          type: string
+          description: Custom HTML for the footer in the design.
+        heading_font_size:
+          type: integer
+          description: Font size of the headings in the design.
+        text_font_size:
+          type: integer
+          description: Font size of the body text in the design.
+        button_font_size:
+          type: integer
+          description: Font size of the button text in the design.
+        button_font:
+          type: string
+          description: Font used for buttons in the design.
+        view_in_browser_link:
+          type: boolean
+          description: Indicates if a 'view in browser' link is included in the design.
+        view_in_browser_color:
+          type: string
+          description: Color of the 'view in browser' link in the design.
+        view_in_browser_font:
+          type: string
+          description: Font used for the 'view in browser' link in the design.
+        view_in_browser_background:
+          type: string
+          description: Background color of the 'view in browser' link in the design.
+        view_in_browser_text:
+          type: string
+          description: Text for the 'view in browser' link in the design.
+        view_in_browser_size:
+          type: integer
+          description: Font size of the 'view in browser' link in the design.
+        view_in_browser_align:
+          type: string
+          description: Alignment of the 'view in browser' link in the design.
+        name:
+          type: string
+          description: Name of the design.
+        button_radius:
+          type: integer
+          description: Border radius of the buttons in the design.
+        footer_font:
+          type: string
+          description: Font used for the footer text in the design.
+        footer_font_color:
+          type: string
+          description: Color of the footer font in the design.
+        footer_font_size:
+          type: integer
+          description: Font size of the footer text in the design.
+        footer_align:
+          type: string
+          description: Alignment of the footer text in the design.
+        footer_line_height:
+          type: number
+          format: float
+          description: Line height of the footer text in the design.
+        header_link_horizontal_spacing:
+          type: integer
+          description: Horizontal spacing of header links in the design.
+        display_header_links:
+          type: boolean
+          description: Indicates if header links are displayed in the design.
+        text_line_height:
+          type: number
+          format: float
+          description: Line height of the body text in the design.
+        socials_background_color:
+          type: string
+          description: Background color of the social icons section in the design.
+        socials_icon_size:
+          type: integer
+          description: Size of the social icons in the design.
+        socials_icon_style:
+          type: string
+          description: Style of the social icons in the design.
+        socials_icon_spacing:
+          type: integer
+          description: Spacing between social icons in the design.
+        link_color:
+          type: string
+          description: Color of links in the design.
+        show_header_links:
+          type: boolean
+          description: Indicates if header links are shown in the design.
+        show_header_custom_html:
+          type: boolean
+          description: Indicates if custom HTML is shown in the header of the design.
+        show_footer_custom_html:
+          type: boolean
+          description: Indicates if custom HTML is shown in the footer of the design.
+        show_logo:
+          type: boolean
+          description: Indicates if the logo is shown in the design.
+        show_socials:
+          type: boolean
+          description: Indicates if social icons are shown in the design.
+        logo_alignment:
+          type: string
+          description: Alignment of the logo in the design.
+        header_links_alignment:
+          type: string
+          description: Alignment of the header links in the design.
+        page_background:
+          type: string
+          description: Type of page background in the design.
+        page_background_color:
+          type: string
+          description: Color of the page background in the design.
+        header_link_vertical_spacing:
+          type: integer
+          description: Vertical spacing of header links in the design.
+        header_link_auto_horizontal_spacing:
+          type: boolean
+          description: Indicates if header links have automatic horizontal spacing in the design.
+        header_link_separator:
+          type: string
+          description: Separator used between header links in the design.
+        header_link_separator_color:
+          type: string
+          description: Color of the header link separator in the design.
+    NewsletterPayload:
+      type: object
+      description: Newsletter campaign payload
+      required:
+        - name
+        - subject
+        - preview_text
+        - design
+        - blocks
+        - send_to_all_lists
+      properties:
+        name:
+          type: string
+          description: Name of the campaign.
+        subject:
+          type: string
+          description: Subject line of the newsletter.
+        preview_text:
+          type: string
+          description: Preview text for the newsletter.
+        send_to_all_lists:
+          type: boolean
+          description: Whether to send the newsletter to all subscriber lists.
+        design:
+          $ref: '#/components/schemas/Design'
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewsletterBlock'
+    NewsletterUpdatePayload:
+      type: object
+      description: Newsletter campaign payload for updates
+      properties:
+        name:
+          type: string
+          description: Name of the campaign.
+        subject:
+          type: string
+          description: Subject line of the newsletter.
+        preview_text:
+          type: string
+          description: Preview text for the newsletter.
+        send_to_all_lists:
+          type: boolean
+          description: Whether to send the newsletter to all subscriber lists.
+        design:
+          $ref: '#/components/schemas/Design'
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewsletterBlock'
+    NewsletterBlock:
+      type: object
+      required:
+        - type
+        - position
+        - grid_columns_number
+        - fields
+      properties:
+        type:
+          type: string
+          description: Type of the block (image, text, line, button)
+          enum: [image, text, line, button]
+        position:
+          type: integer
+          description: Position of the block in the newsletter.
+        grid_columns_number:
+          type: integer
+          description: Number of grid columns for the block.
+        fields:
+          type: object
+          description: Fields specific to the block type.
+    SubscriberList:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the subscriber list.
+        store_id:
+          type: integer
+          description: Identifier of the store associated with the list.
+        source:
+          type: string
+          description: Source of the list (e.g., 'customer', 'custom').
+        name:
+          type: string
+          description: Name of the subscriber list.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the list was created.
+        subscribers_count:
+          type: integer
+          description: Total number of subscribers in the list.
+        subscribed_subscribers_count:
+          type: integer
+          description: Number of subscribed subscribers in the list.
+        suppressed_subscribers_count:
+          type: integer
+          description: Number of suppressed subscribers in the list.
+        unsubscribed_subscribers_count:
+          type: integer
+          description: Number of unsubscribed subscribers in the list.
+        blocked_subscribers_count:
+          type: integer
+          description: Number of blocked subscribers in the list.
+        smartlist:
+          type: boolean
+          description: Indicates if the list is a smart list.
+        last_time_used_at:
+          type: string
+          format: date-time
+          description: Date and time when the list was last used.
+        segment_unique_count:
+          type: integer
+          description: Unique count of segments in the list.
+        sms_subscribers_count:
+          type: integer
+          description: Number of SMS subscribers in the list.
+        email_subscribers_count:
+          type: integer
+          description: Number of email subscribers in the list.
+        sms_suppressed_subscribers_count:
+          type: integer
+          description: Number of suppressed SMS subscribers in the list.
+        sms_not_valid_subscribers_count:
+          type: integer
+          description: Number of SMS subscribers with invalid numbers.
+        not_subscribed_subscribers_count:
+          type: integer
+          description: Number of subscribers who are not subscribed.
+        bounced_subscribers_count:
+          type: integer
+          description: Number of bounced subscribers in the list.
+        complained_subscribers_count:
+          type: integer
+          description: Number of subscribers who have complained.
+        recently_sent_non_subscribed_contacts:
+          type: integer
+          description: Number of recently sent non-subscribed contacts.
+    Subscriber:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the subscriber.
+        email:
+          type: string
+          format: email
+          description: The subscriber's email address.
+        first_name:
+          type: string
+          description: The subscriber's first name.
+        last_name:
+          type: string
+          description: The subscriber's last name.
+        phone:
+          type: string
+          description: The subscriber's phone number.
+        subscribed:
+          type: boolean
+          description: Indicates if the subscriber is currently subscribed to mailings.
+        list_ids:
+          type: array
+          items:
+            type: integer
+          description: An array of list IDs this subscriber belongs to.
+        custom_fields:
+          description: A list of custom fields associated with the subscriber.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomField'
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the subscriber was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the subscriber was last updated.
+    SubscriberInput:
+      type: object
+      description: Schema for creating or updating a subscriber.
+      properties:
+        first_name:
+          type: string
+          description: The subscriber's first name.
+        last_name:
+          type: string
+          description: The subscriber's last name.
+        email:
+          type: string
+          format: email
+          description: The subscriber's email address.
+        subscribed:
+          type: boolean
+          description: Set the subscription status. Defaults to true.
+        phone:
+          type: string
+          description: The subscriber's phone number.
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomField'
+          description: A list of custom fields to associate with the subscriber.
+    CustomField:
+      type: object
+      properties:
+        field_name:
+          type: string
+          description: The name of the custom field.
+        value_type:
+          type: string
+          description: The data type of the custom field value (e.g., 'string', 'number').
+        value:
+          type: string
+          description: The value of the custom field.
+    Automation:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the automation.
+        type:
+          type: string
+          description: Type of the automation.
+        status:
+          type: string
+          description: Current status of the automation (e.g., active, populating, paused, pending). Only active can send emails.
+        name:
+          type: string
+          description: Name of the automation.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the automation was created.
+        enabled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time when the automation was enabled.
+        sent_count:
+          type: integer
+          description: Total number of messages sent by the automation.
+        send_to_profiles:
+          type: boolean
+          description: Indicates if the automation is set to send messages to profiles.
+    Coupon:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the coupon.
+        name:
+          type: string
+          description: The name of the coupon.
+        status:
+          type: string
+          description: The status of the coupon (e.g., 'active', 'inactive').
+        usage_type:
+          type: string
+          description: The usage type of the coupon (e.g., 'unique', 'quantity', 'unlimited').
+        usage_limit:
+          type: integer
+          description: The maximum number of times the coupon can be used.
+        discount_type:
+          type: string
+          description: The type of discount (e.g., 'fixed_amount', 'percentage', 'free_shipping').
+        discount_amount:
+          type: number
+          format: float
+          description: The amount of discount provided by the coupon.
+        discount_amount_currency:
+          type: string
+          description: The currency of the discount amount (e.g., 'USD', 'EUR').
+        product_ids:
+          type: array
+          items:
+            type: integer
+          description: An array of product IDs the coupon applies to.
+        appliable_conditions:
+          type: object
+          description: Conditions under which the coupon can be applied (e.g., minimum purchase amount).
+        expire_condition:
+          type: string
+          description: The expiration condition of the coupon (e.g., 'never', 'days', 'date').
+        expire_date:
+          type: string
+          format: date
+          description: The expiration date of the coupon (if applicable).
+        expire_days:
+          type: integer
+          description: The number of days after issue when the coupon expires (if applicable).
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the coupon was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the coupon was last updated.
+        code:
+          type: string
+          description: The unique code of the coupon.
+        redeemed_count:
+          type: integer
+          description: The number of times the coupon has been redeemed.
+    CouponInput:
+      type: object
+      required:
+        - price_rule_id
+        - code
+        - usage_type
+      properties:
+        name:
+          type: string
+          description: The name of the coupon.
+        price_rule_id:
+          type: integer
+          description: The ID of the price rule to associate with the coupon.
+        code:
+          type: string
+          description: The unique code for the coupon.
+        prefix:
+          type: string
+          description: A prefix to prepend to the coupon code.
+        status:
+          type: string
+          description: The status of the coupon (e.g., 'active', 'inactive').
+        usage_type:
+          type: string
+          description: The usage type of the coupon (e.g., 'unique', 'quantity', 'unlimited').
+        usage_limit:
+          type: integer
+          description: The maximum number of times the coupon can be used.
+        discount_type:
+          type: string
+          description: The type of discount (e.g., 'fixed_amount', 'percentage', 'free_shipping').
+        discount_amount:
+          type: number
+          format: float
+          description: The amount of discount provided by the coupon.
+        discount_amount_currency:
+          type: string
+          description: The currency of the discount amount (e.g., 'USD', 'EUR').
+        expire_condition:
+          type: string
+          description: The expiration condition of the coupon (e.g., 'never', 'days', 'date').
+        expire_date:
+          type: string
+          format: date
+          description: The expiration date of the coupon (if applicable).
+        expire_days:
+          type: integer
+          description: The number of days after issue when the coupon expires (if applicable).
+        appliable_conditions:
+          type: array
+          items:
+            type: string
+          description: The minimum purchase amount required to apply the coupon.
+        product_ids:
+          type: array
+          items:
+            type: integer
+          description: An array of product IDs the coupon applies to.
+    Mailing:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the mailing.
+        subject:
+          type: string
+          description: Subject line of the mailing.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the mailing was created.
+        store_id:
+          type: integer
+          description: Identifier of the store associated with the mailing.
+        campaign_id:
+          type: integer
+          description: Identifier of the campaign associated with the mailing.
+        subscribers_count:
+          type: integer
+          description: Number of subscribers targeted by the mailing.
+        orders_count:
+          type: integer
+          description: Number of orders generated from the mailing.
+        sales_total:
+          type: string
+          description: Total sales amount generated from the mailing.
+        opened_count:
+          type: integer
+          description: Number of times the mailing was opened.
+        clicked_count:
+          type: integer
+          description: Number of times links in the mailing were clicked.
+        uniq_opened_count:
+          type: integer
+          description: Number of unique subscribers who opened the mailing.
+        uniq_clicked_count:
+          type: integer
+          description: Number of unique subscribers who clicked links in the mailing.
+        delivered_count:
+          type: integer
+          description: Number of successfully delivered mailings.
+        unsubscribed_count:
+          type: integer
+          description: Number of unsubscribes resulting from the mailing.
+        bounced_count:
+          type: integer
+          description: Number of bounced mailings.
+        complained_count:
+          type: integer
+          description: Number of complaints received for the mailing.
+        ab_testing:
+          type: boolean
+          description: Indicates if A/B testing was used in the mailing.
+        ui_visible:
+          type: boolean
+          description: Indicates if the mailing is visible in the UI.
+        subscriber_id:
+          type: integer
+          description: Identifier of the subscriber associated with the mailing.
+        non_subscribers_count:
+          type: integer
+          description: Number of non-subscribers targeted by the mailing.
+    MailingContent:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the mailing.
+        html:
+          type: string
+          description: HTML content of the mailing.
+    ProductFeed:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the product feed.
+        store_id:
+          type: integer
+          description: Identifier of the store associated with the product feed.
+        excluded_products_count:
+          type: integer
+          description: Number of products excluded from the feed.
+        min_stock:
+          type: integer
+          description: Minimum stock level required for products to be included in the feed.
+        ignore_stock:
+          type: boolean
+          description: Indicates if stock levels are ignored when generating the feed.
+        back_order_product:
+          type: boolean
+          description: Indicates if back-ordered products are included in the feed.
+        type:
+          type: string
+          description: Type of the product feed (e.g., 'BestSellerProductFeed', 'NewArrivalsProductFeed', 'SlowMovingProductFeed').
+        products_count:
+          type: integer
+          description: Number of products in the feed.
+        name:
+          type: string
+          description: Name of the product feed.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the product feed was created.
+        status:
+          type: string
+          description: Current status of the product feed (e.g., 'active', 'draft', 'refreshing').
+
