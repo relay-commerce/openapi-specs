@@ -740,7 +740,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewsletterPayload'
+              type: object
+              required:
+                - payload
+              properties:
+                payload:
+                  $ref: '#/components/schemas/NewsletterPayload'
       responses:
         "201":
           description: Successfully created newsletter campaign
@@ -779,7 +784,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewsletterUpdatePayload'
+              type: object
+              properties:
+                payload:
+                  $ref: '#/components/schemas/NewsletterUpdatePayload'
       responses:
         "200":
           description: Successfully updated newsletter campaign
@@ -2928,4 +2936,3 @@ components:
         status:
           type: string
           description: Current status of the product feed (e.g., 'active', 'draft', 'refreshing').
-
