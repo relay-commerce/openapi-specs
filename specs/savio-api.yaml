@@ -1,0 +1,403 @@
+openapi: 3.0.4
+info:
+  title: Savio API
+  description: "API for creating customer feedback, managing contacts, and managing companies in Savio.\n\n## Authentication\n\nAll endpoints require a token-based authentication.\n\nThe token must be included in the Authorization header in the following format:\n\n```\nAuthorization: Token YOUR_API_TOKEN\n```\n\nYou can find your API token on the [API Settings](https://www.savio.io/app/accounts/api-access) page in your Savio account.\n"
+  version: 1.0.0
+  contact:
+    name: Savio API Support
+    email: nvibert@relaycommerce.io
+  license:
+    name: Proprietary
+    url: https://www.savio.io/terms
+servers:
+  - url: https://www.savio.io/app/api
+    description: Production server
+security:
+  - TokenAuth: []
+tags:
+  - name: Feedback
+    description: Create customer feedback
+  - name: Contacts
+    description: List and upsert contacts
+  - name: Companies
+    description: List and upsert companies
+paths:
+  /create-feedback:
+    post:
+      summary: Create feedback
+      description: Creates a new piece of customer feedback. Optionally links the feedback to a person, company, feature request, or tags. If the specified person, company, feature request, or tags do not exist, they will be created automatically.
+      operationId: createFeedback
+      tags:
+        - Feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackInput"
+      responses:
+        "201":
+          description: Successfully created feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedbackResponse"
+        "400":
+          description: Bad request - failed to create feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users:
+    get:
+      summary: List contacts
+      description: Retrieves a paginated list of contacts. Supports filtering by name or email and sorting by various fields.
+      operationId: listContacts
+      tags:
+        - Contacts
+      parameters:
+        - name: search
+          in: query
+          description: Filter contacts by email or name.
+          required: false
+          schema:
+            type: string
+        - name: ordering
+          in: query
+          description: Sort results by a field. Prefix with `-` for descending order.
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - email
+              - created
+              - updated
+              - -name
+              - -email
+              - -created
+              - -updated
+      responses:
+        "200":
+          description: Successfully retrieved contacts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedContactList"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Upsert contact
+      description: Creates a new contact or updates an existing one. The contact is matched by `internal_id`. If a contact with the given `internal_id` exists, it will be updated; otherwise, a new contact will be created.
+      operationId: upsertContact
+      tags:
+        - Contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Successfully created or updated contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /companies:
+    get:
+      summary: List companies
+      description: Retrieves a paginated list of companies. Supports filtering by name and sorting by various fields.
+      operationId: listCompanies
+      tags:
+        - Companies
+      parameters:
+        - name: search
+          in: query
+          description: Filter companies by name.
+          required: false
+          schema:
+            type: string
+        - name: ordering
+          in: query
+          description: Sort results by a field. Prefix with `-` for descending order.
+          required: false
+          schema:
+            type: string
+            enum:
+              - name
+              - created
+              - updated
+              - -name
+              - -created
+              - -updated
+      responses:
+        "200":
+          description: Successfully retrieved companies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCompanyList"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Upsert company
+      description: Creates a new company or updates an existing one. The company is matched by `internal_id`. If a company with the given `internal_id` exists, it will be updated; otherwise, a new company will be created.
+      operationId: upsertCompany
+      tags:
+        - Companies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "201":
+          description: Successfully created or updated company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "Token-based authentication. Include your API token in the Authorization header with the format: 'Token YOUR_API_TOKEN'."
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A short description of the error.
+        message:
+          type: string
+          description: A detailed error message.
+      example:
+        error: Authentication failed
+        message: Invalid or missing API token
+    FeedbackInput:
+      type: object
+      required:
+        - problem
+      properties:
+        problem:
+          type: string
+          description: Text describing the customer's problem or feedback.
+        feedback_type:
+          type: string
+          description: Type of customer providing the feedback.
+          enum:
+            - ACTIVE
+            - CHURNED
+            - INTERNAL
+            - LOST DEAL
+            - PROSPECT
+            - OTHER
+        state:
+          type: string
+          description: Triage state of the feedback. Defaults to ACTIVE.
+          default: ACTIVE
+          enum:
+            - ACTIVE
+            - PENDING
+            - ARCHIVED
+        source_url:
+          type: string
+          description: URL linking to the original source of the feedback.
+        source_username:
+          type: string
+          description: Name of the user who added the feedback.
+        person_email:
+          type: string
+          format: email
+          description: Email address of the person providing feedback. Creates a new person if one does not already exist with this email.
+        person_name:
+          type: string
+          description: Full name of the person providing feedback. Creates a new person if one does not already exist.
+        company_name:
+          type: string
+          description: Name of the company associated with the feedback. Links to an existing company or creates a new one.
+        feature_request_title:
+          type: string
+          description: Title of the feature request to link to this feedback. Links to an existing feature request or creates a new one.
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tag titles to associate with the feedback. Creates tags if they do not already exist.
+    FeedbackResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the newly created feedback.
+      example:
+        id: 12345
+    Contact:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier assigned by Savio.
+        email:
+          type: string
+          format: email
+          description: Email address of the contact.
+        name:
+          type: string
+          description: Full name of the contact.
+        company:
+          type: integer
+          nullable: true
+          description: Savio ID of the associated company.
+        company_name:
+          type: string
+          nullable: true
+          description: Name of the associated company.
+        filterable_attributes:
+          type: object
+          additionalProperties: true
+          description: User-supplied custom attributes for filtering.
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the contact was created (ISO 8601 format).
+        updated:
+          type: string
+          format: date-time
+          description: Timestamp when the contact was last updated (ISO 8601 format).
+    ContactInput:
+      type: object
+      required:
+        - internal_id
+        - name
+      properties:
+        internal_id:
+          type: string
+          description: The contact's unique identifier in your system. Used to match existing contacts for upsert.
+        name:
+          type: string
+          description: Full name of the contact.
+        email:
+          type: string
+          format: email
+          description: Email address of the contact.
+        company:
+          type: integer
+          description: Savio ID of the company to associate with this contact.
+        company_internal_id:
+          type: string
+          description: Your system's unique identifier for the company. Used to associate the contact with a company by your internal ID.
+        filterable_attributes:
+          type: object
+          additionalProperties: true
+          description: Custom attributes for filtering. Keys and values are user-defined.
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier assigned by Savio.
+        name:
+          type: string
+          description: Name of the company.
+        internal_id:
+          type: string
+          description: The company's unique identifier in your system.
+        filterable_attributes:
+          type: object
+          additionalProperties: true
+          description: User-supplied custom attributes for filtering.
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the company was created (ISO 8601 format).
+        updated:
+          type: string
+          format: date-time
+          description: Timestamp when the company was last updated (ISO 8601 format).
+    CompanyInput:
+      type: object
+      required:
+        - name
+        - internal_id
+      properties:
+        name:
+          type: string
+          description: Name of the company.
+        internal_id:
+          type: string
+          description: The company's unique identifier in your system. Used to match existing companies for upsert.
+        filterable_attributes:
+          type: object
+          additionalProperties: true
+          description: Custom attributes for filtering. Keys and values are user-defined.
+    PaginatedContactList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of contacts matching the query.
+        next:
+          type: string
+          nullable: true
+          description: URL to the next page of results, or null if this is the last page.
+        previous:
+          type: string
+          nullable: true
+          description: URL to the previous page of results, or null if this is the first page.
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+          description: List of contacts for the current page.
+    PaginatedCompanyList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of companies matching the query.
+        next:
+          type: string
+          nullable: true
+          description: URL to the next page of results, or null if this is the last page.
+        previous:
+          type: string
+          nullable: true
+          description: URL to the previous page of results, or null if this is the first page.
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Company"
+          description: List of companies for the current page.
