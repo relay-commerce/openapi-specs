@@ -22,7 +22,7 @@ tags:
   - name: Companies
     description: List and upsert companies
 paths:
-  /create-feedback:
+  /create-feedback/:
     post:
       summary: Create feedback
       description: Creates a new piece of customer feedback. Optionally links the feedback to a person, company, feature request, or tags. If the specified person, company, feature request, or tags do not exist, they will be created automatically.
@@ -54,7 +54,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /users:
+  /users/:
     get:
       summary: List contacts
       description: Retrieves a paginated list of contacts. Supports filtering by name or email and sorting by various fields.
@@ -98,7 +98,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Upsert contact
-      description: Creates a new contact or updates an existing one. The contact is matched by `internal_id`. If a contact with the given `internal_id` exists, it will be updated; otherwise, a new contact will be created.
+      description: Creates a new contact or updates an existing one. The contact is matched by `email` or `internal_id`. If a contact with the given email address or internal_id already exists, it will be updated; otherwise, a new contact will be created.
       operationId: upsertContact
       tags:
         - Contacts
@@ -121,7 +121,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /companies:
+  /companies/:
     get:
       summary: List companies
       description: Retrieves a paginated list of companies. Supports filtering by name and sorting by various fields.
@@ -247,7 +247,7 @@ components:
           description: Full name of the person providing feedback. Creates a new person if one does not already exist.
         company_name:
           type: string
-          description: Name of the company associated with the feedback. Links to an existing company or creates a new one.
+          description: Name of the company associated with the feedback. Links to an existing company or creates a new one. Ignored if neither person_name nor person_email is included.
         feature_request_title:
           type: string
           description: Title of the feature request to link to this feedback. Links to an existing feature request or creates a new one.
@@ -312,7 +312,7 @@ components:
         email:
           type: string
           format: email
-          description: Email address of the contact.
+          description: Email address of the contact. Also used to match existing contacts for upsert.
         company:
           type: integer
           description: Savio ID of the company to associate with this contact.
