@@ -17,6 +17,8 @@ security:
 tags:
   - name: Feedback
     description: Create customer feedback
+  - name: Feature Requests
+    description: List and retrieve feature requests
   - name: Contacts
     description: List and upsert contacts
   - name: Companies
@@ -159,6 +161,117 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /feature-requests/:
+    get:
+      summary: List feature requests
+      description: Retrieves a paginated list of feature requests. Supports filtering by title, state, product, product area, tag, and roadmap, as well as sorting.
+      operationId: listFeatureRequests
+      tags:
+        - Feature Requests
+      parameters:
+        - name: search
+          in: query
+          description: Filter feature requests by title.
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Filter by feature request status.
+          required: false
+          schema:
+            type: string
+            enum:
+              - UNTRIAGED
+              - UNDER_CONSIDERATION
+              - PLANNED
+              - IN_PROGRESS
+              - SHIPPED
+              - CUSTOMER_NOTIFIED
+              - WONT_DO
+        - name: product
+          in: query
+          description: Filter by product slug. Requires Product feature to be enabled.
+          required: false
+          schema:
+            type: string
+        - name: product_area
+          in: query
+          description: Filter by product area slug. Requires Product Area feature to be enabled.
+          required: false
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Filter by tag title (exact match).
+          required: false
+          schema:
+            type: string
+        - name: roadmap
+          in: query
+          description: Filter by roadmap title (exact match).
+          required: false
+          schema:
+            type: string
+        - name: ordering
+          in: query
+          description: Sort results by a field. Prefix with `-` for descending order.
+          required: false
+          schema:
+            type: string
+            enum:
+              - title
+              - created
+              - updated
+              - -title
+              - -created
+              - -updated
+      responses:
+        "200":
+          description: Successfully retrieved feature requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFeatureRequestList"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /feature-requests/{id}/:
+    get:
+      summary: Get feature request
+      description: Retrieves a single feature request by its ID.
+      operationId: getFeatureRequest
+      tags:
+        - Feature Requests
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the feature request.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully retrieved feature request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeatureRequest"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Feature request not found
           content:
             application/json:
               schema:
@@ -652,6 +765,124 @@ components:
           format: date-time
           nullable: true
           description: Timestamp when the feature was shipped, or null.
+    FeatureRequest:
+      type: object
+      description: A feature request tracked in Savio.
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the feature request.
+        title:
+          type: string
+          description: Title of the feature request.
+        description:
+          type: string
+          description: Detailed description of the feature request.
+        state:
+          type: string
+          description: Current status of the feature request.
+          enum:
+            - UNTRIAGED
+            - UNDER_CONSIDERATION
+            - PLANNED
+            - IN_PROGRESS
+            - SHIPPED
+            - CUSTOMER_NOTIFIED
+            - WONT_DO
+        state_display:
+          type: string
+          description: Human-readable display value of the state.
+        priority:
+          type: string
+          description: Priority level of the feature request.
+        priority_display:
+          type: string
+          description: Human-readable display value of the priority.
+        effort:
+          type: string
+          description: Estimated effort for the feature request.
+        effort_display:
+          type: string
+          description: Human-readable display value of the effort.
+        product:
+          type: string
+          nullable: true
+          description: Slug of the associated product.
+        product_display:
+          type: string
+          nullable: true
+          description: Human-readable display value of the product.
+        product_area:
+          type: string
+          nullable: true
+          description: Slug of the associated product area.
+        product_area_display:
+          type: string
+          nullable: true
+          description: Human-readable display value of the product area.
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+          description: Tags associated with the feature request.
+        roadmaps:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapEntry"
+          description: Roadmaps this feature request belongs to.
+        is_public:
+          type: boolean
+          description: Whether the feature request is publicly visible.
+        shipped_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the feature was shipped, or null.
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the feature request was created (ISO 8601 format).
+        updated:
+          type: string
+          format: date-time
+          description: Timestamp when the feature request was last updated (ISO 8601 format).
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the tag.
+        title:
+          type: string
+          description: Title of the tag.
+    RoadmapEntry:
+      type: object
+      properties:
+        roadmap:
+          type: string
+          description: Name of the roadmap.
+        column:
+          type: string
+          description: Name of the column within the roadmap.
+    PaginatedFeatureRequestList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of feature requests matching the query.
+        next:
+          type: string
+          nullable: true
+          description: URL to the next page of results, or null if this is the last page.
+        previous:
+          type: string
+          nullable: true
+          description: URL to the previous page of results, or null if this is the last page.
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureRequest"
+          description: List of feature requests for the current page.
     PaginatedFeedbackList:
       type: object
       properties:
