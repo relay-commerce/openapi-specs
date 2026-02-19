@@ -22,6 +22,115 @@ tags:
   - name: Companies
     description: List and upsert companies
 paths:
+  /feedback/:
+    get:
+      summary: List feedback
+      description: Retrieves a paginated list of feedback. Supports filtering by text, state, product, and product area, as well as sorting and expanding related objects inline.
+      operationId: listFeedback
+      tags:
+        - Feedback
+      parameters:
+        - name: search
+          in: query
+          description: Filter feedback by feedback text or company name.
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Filter feedback by triage state.
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - PENDING
+              - ARCHIVED
+        - name: product
+          in: query
+          description: Filter by product slug.
+          required: false
+          schema:
+            type: string
+        - name: product_area
+          in: query
+          description: Filter by product area slug.
+          required: false
+          schema:
+            type: string
+        - name: ordering
+          in: query
+          description: Sort results by a field. Prefix with `-` for descending order.
+          required: false
+          schema:
+            type: string
+            enum:
+              - user
+              - feature_request
+              - created
+              - updated
+              - -user
+              - -feature_request
+              - -created
+              - -updated
+        - name: expand
+          in: query
+          description: "Comma-separated list of related objects to inline in the response. Supported values: `user` (expands to full contact object), `feature_request` (expands to full feature request object)."
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFeedbackList"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /feedback/{id}/:
+    get:
+      summary: Get feedback
+      description: Retrieves a single piece of feedback by its ID. Supports expanding related objects inline.
+      operationId: getFeedback
+      tags:
+        - Feedback
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the feedback.
+          required: true
+          schema:
+            type: integer
+        - name: expand
+          in: query
+          description: "Comma-separated list of related objects to inline in the response. Supported values: `user` (expands to full contact object), `feature_request` (expands to full feature request object)."
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedbackItem"
+        "401":
+          description: Authentication failed or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Feedback not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /create-feedback/:
     post:
       summary: Create feedback
@@ -401,3 +510,164 @@ components:
           items:
             $ref: "#/components/schemas/Company"
           description: List of companies for the current page.
+    FeedbackItem:
+      type: object
+      description: "A piece of customer feedback. The `user` and `feature_request` fields return integer IDs by default, but can be expanded to full objects using the `expand` query parameter."
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the feedback.
+        problem:
+          type: string
+          description: Text describing the customer's problem or feedback.
+        feature_request:
+          description: "ID of the linked feature request, or an expanded FeatureRequestDetail object when `expand=feature_request` is used."
+          oneOf:
+            - type: integer
+            - $ref: "#/components/schemas/FeatureRequestDetail"
+        feedback_type:
+          type: string
+          description: Type of customer providing the feedback.
+          enum:
+            - ACTIVE
+            - CHURNED
+            - INTERNAL
+            - LOST DEAL
+            - PROSPECT
+            - OTHER
+        feedback_type_display:
+          type: string
+          description: Human-readable display value of the feedback type.
+        user:
+          description: "ID of the contact who provided the feedback, or an expanded ContactDetail object when `expand=user` is used."
+          oneOf:
+            - type: integer
+            - $ref: "#/components/schemas/ContactDetail"
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the feedback was created (ISO 8601 format).
+        updated:
+          type: string
+          format: date-time
+          description: Timestamp when the feedback was last updated (ISO 8601 format).
+        notified_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when a notification was sent for this feedback, or null.
+        state:
+          type: string
+          description: Triage state of the feedback.
+          enum:
+            - ACTIVE
+            - PENDING
+            - ARCHIVED
+        product:
+          type: string
+          nullable: true
+          description: Slug of the associated product.
+        product_area:
+          type: string
+          nullable: true
+          description: Slug of the associated product area.
+        importance:
+          type: integer
+          nullable: true
+          description: Importance level of the feedback.
+    ContactDetail:
+      type: object
+      description: Expanded contact object returned when using `expand=user`.
+      properties:
+        id:
+          type: integer
+          description: Unique identifier assigned by Savio.
+        email:
+          type: string
+          format: email
+          description: Email address of the contact.
+        internal_id:
+          type: string
+          description: The contact's unique identifier in your system.
+        name:
+          type: string
+          description: Full name of the contact.
+        company:
+          type: integer
+          nullable: true
+          description: Savio ID of the associated company.
+        company_internal_id:
+          type: string
+          nullable: true
+          description: Your system's unique identifier for the company.
+        company_name:
+          type: string
+          nullable: true
+          description: Name of the associated company.
+        filterable_attributes:
+          type: object
+          additionalProperties: true
+          description: User-supplied custom attributes for filtering.
+    FeatureRequestDetail:
+      type: object
+      description: Expanded feature request object returned when using `expand=feature_request`.
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the feature request.
+        title:
+          type: string
+          description: Title of the feature request.
+        description:
+          type: string
+          description: Detailed description of the feature request.
+        state:
+          type: string
+          description: Current state of the feature request.
+        state_display:
+          type: string
+          description: Human-readable display value of the state.
+        priority:
+          type: string
+          description: Priority level of the feature request.
+        priority_display:
+          type: string
+          description: Human-readable display value of the priority.
+        effort:
+          type: string
+          description: Estimated effort for the feature request.
+        effort_display:
+          type: string
+          description: Human-readable display value of the effort.
+        product:
+          type: string
+          nullable: true
+          description: Slug of the associated product.
+        product_area:
+          type: string
+          nullable: true
+          description: Slug of the associated product area.
+        shipped_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the feature was shipped, or null.
+    PaginatedFeedbackList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of feedback items matching the query.
+        next:
+          type: string
+          nullable: true
+          description: URL to the next page of results, or null if this is the last page.
+        previous:
+          type: string
+          nullable: true
+          description: URL to the previous page of results, or null if this is the first page.
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeedbackItem"
+          description: List of feedback items for the current page.
